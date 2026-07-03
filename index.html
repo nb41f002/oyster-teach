@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>教學提詞台 · 臺南小蚵人雙語營</title>
+<style>
+  :root{
+    --navy:#12374B; --ocean:#0F4C4A; --tan:#FBF3E7; --gold:#B9862E;
+    --oyst:#C4632B; --bamboo:#3F7A4E; --ink:#1B2A33; --line:#D9C9AE;
+    --bg:#F3EEE3; --card:#ffffff; --muted:#6b7a80;
+    --zh:#243A44; --en:#0B5E6E; --cue:#B0561F; --stu:#2E6B8C; --cmd:#0B5E6E; --fz:1;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:"PingFang TC","Noto Sans CJK TC","Microsoft JhengHei",system-ui,sans-serif;}
+  body.dark{--bg:#0c1a20; --card:#132630; --tan:#16303a; --ink:#eaf1f2; --zh:#dfeaec; --line:#2c4650; --muted:#8fa6ad;}
+  .wrap{max-width:840px; margin:0 auto; padding:0 14px 130px;}
+  header{position:sticky; top:0; z-index:30; background:var(--navy); color:#fff;
+    padding:calc(10px + env(safe-area-inset-top)) 14px 10px; box-shadow:0 2px 10px rgba(0,0,0,.15);}
+  .hin{max-width:840px;margin:0 auto}
+  .brand{font-size:.7rem; letter-spacing:.12em; color:#CDE4E9; opacity:.9}
+  .htitle{font-size:1.16rem; font-weight:800; margin-top:2px}
+  .htitle small{font-weight:500;opacity:.82;font-size:.86rem;margin-left:6px}
+  .role{display:inline-block; margin-top:6px; font-size:.72rem; background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.25); padding:2px 9px; border-radius:999px}
+  .days{display:flex; gap:8px; overflow-x:auto; padding:10px 0 2px; -webkit-overflow-scrolling:touch}
+  .day{flex:0 0 auto; min-width:112px; background:var(--card); border:1.5px solid var(--line);
+    border-radius:14px; padding:8px 11px; cursor:pointer; color:var(--ink)}
+  .day.on{border-color:var(--oyst); box-shadow:0 3px 0 var(--oyst)}
+  .day .dn{font-size:.64rem; color:var(--muted)}
+  .day .dt{font-weight:800; font-size:.9rem; margin-top:1px}
+  .day .dr{font-size:.6rem; color:var(--oyst); margin-top:2px}
+  .bar{display:flex; align-items:center; gap:8px; margin:8px 0 4px; flex-wrap:wrap}
+  .prog{flex:1; height:8px; background:var(--line); border-radius:99px; overflow:hidden; min-width:120px}
+  .prog > i{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--bamboo),var(--gold)); transition:width .3s}
+  .btn{border:1.5px solid var(--line); background:var(--card); color:var(--ink);
+    border-radius:10px; padding:6px 11px; font-size:.78rem; font-weight:700; cursor:pointer}
+  .cnt{font-size:.72rem; color:var(--muted)}
+  .plabel{margin:16px 2px 6px; font-size:.78rem; font-weight:800; color:var(--navy);
+    border-left:4px solid var(--oyst); padding-left:8px; letter-spacing:.02em}
+  body.dark .plabel{color:#e7c88a}
+  .card{background:var(--card); border:1px solid var(--line); border-left:4px solid var(--oyst);
+    border-radius:14px; margin:10px 0; overflow:hidden}
+  .card.star{border-left-color:var(--navy); box-shadow:0 0 0 2px rgba(18,55,75,.12)}
+  .chead{display:flex; align-items:center; gap:9px; padding:11px 13px; cursor:pointer}
+  .time{font-size:.66rem; font-weight:800; background:var(--oyst); color:#fff; padding:3px 8px; border-radius:8px; white-space:nowrap}
+  .star .time{background:var(--navy)}
+  .ctitle{font-weight:800; font-size:1rem; flex:1}
+  .starb{font-size:.58rem; background:#fde9c9; color:#8a5a12; border:1px solid var(--gold); padding:1px 6px; border-radius:6px}
+  .chk{width:26px; height:26px; border-radius:8px; border:2px solid var(--line); display:grid; place-items:center; font-size:.9rem; color:transparent; flex:0 0 auto}
+  .chk.done{background:var(--bamboo); border-color:var(--bamboo); color:#fff}
+  .caret{color:var(--muted); font-size:.85rem; transition:transform .2s}
+  .card.open .caret{transform:rotate(90deg)}
+  .cbody{display:none; padding:0 13px 13px}
+  .card.open .cbody{display:block}
+  .thumb{width:100%; border-radius:10px; border:1px solid var(--line); margin:2px 0 10px; cursor:zoom-in; display:block}
+  .ln{display:flex; gap:8px; margin:7px 0; align-items:flex-start; line-height:1.55}
+  .tag{flex:0 0 auto; font-size:.6rem; font-weight:800; padding:2px 6px; border-radius:6px; margin-top:3px; min-width:26px; text-align:center}
+  .t-zh{background:#e7edf0; color:#4a5b62}.t-en{background:#d6efe6; color:#0b5e6e}
+  .t-cue{background:#f6e3d6; color:#b0561f}.t-stu{background:#dbeaf3; color:#2e6b8c}
+  .x{font-size:calc(1.02rem * var(--fz))}
+  .ln.zh .x{color:var(--zh); font-size:calc(1.05rem * var(--fz))}
+  .ln.en .x{color:var(--en); font-weight:800; font-size:calc(1.2rem * var(--fz))}
+  .ln.cue .x{color:var(--cue); font-size:calc(.92rem * var(--fz))}
+  .ln.stu .x{color:var(--stu); font-weight:700; font-size:calc(1.05rem * var(--fz))}
+  .ln.cmd .x{color:var(--cmd); font-weight:800; font-size:calc(1.1rem * var(--fz))}
+  .ln.note .x{color:var(--muted); font-size:calc(.82rem * var(--fz)); font-style:italic}
+  .steps{background:var(--tan); border:1px solid var(--line); border-radius:12px; padding:4px 12px 10px; margin-top:8px}
+  .steph{font-weight:800; font-size:.9rem; color:var(--navy); margin:12px 0 4px}
+  body.dark .steph{color:#e7c88a}
+  .fab{position:fixed; right:16px; bottom:calc(18px + env(safe-area-inset-bottom)); z-index:40;
+    background:var(--navy); color:#fff; border:none; border-radius:16px; padding:13px 16px;
+    font-weight:800; font-size:.9rem; box-shadow:0 6px 18px rgba(0,0,0,.28); cursor:pointer}
+  .ov{position:fixed; inset:0; z-index:50; background:rgba(8,18,22,.82); display:none; align-items:center; justify-content:center; padding:18px}
+  .ov.on{display:flex}
+  .ovbox{background:var(--card); border-radius:18px; max-width:520px; width:100%; padding:16px; max-height:90vh; overflow:auto}
+  .ovbox h3{margin:2px 0 10px; color:var(--navy)} body.dark .ovbox h3{color:#e7c88a}
+  .cmdrow{display:flex; align-items:center; gap:10px; background:var(--tan); border:1px solid var(--line); border-radius:12px; padding:11px 13px; margin:8px 0}
+  .cmdrow .call{font-weight:800; font-size:1.05rem; color:var(--navy)} body.dark .cmdrow .call{color:#dfeaec}
+  .cmdrow .arr{color:var(--oyst); font-weight:800}
+  .cmdrow .resp{font-weight:800; font-size:1.15rem; color:var(--oyst)}
+  .cmdrow .act{margin-left:auto; font-size:.72rem; color:var(--muted)}
+  .close{float:right; border:none; background:var(--line); border-radius:10px; padding:5px 11px; font-weight:800; cursor:pointer; color:#4a3a1a}
+  .lb{position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.92); display:none; align-items:center; justify-content:center; padding:12px}
+  .lb.on{display:flex} .lb img{max-width:100%; max-height:92vh; border-radius:8px}
+  .hint{font-size:.72rem; color:var(--muted); text-align:center; margin:14px 0}
+  footer{text-align:center; color:var(--muted); font-size:.7rem; margin-top:20px}
+</style>
+</head>
+<body>
+<header><div class="hin">
+  <div class="brand">臺南小蚵人說書辦桌 · 雙語營 · 教學提詞台</div>
+  <div class="htitle" id="htitle"></div>
+  <span class="role" id="hrole"></span>
+</div></header>
+
+<div class="wrap">
+  <div class="days" id="days"></div>
+  <div class="bar">
+    <button class="btn" id="expand">全部展開</button>
+    <button class="btn" id="dark">🌙 暗色/大字</button>
+    <div class="prog"><i id="pbar"></i></div>
+    <span class="cnt" id="cnt"></span>
+  </div>
+  <div id="list"></div>
+  <p class="hint">點卡片標題可展開／收合 · 點簡報圖可放大 · 右下「四大口令」隨時叫出</p>
+  <footer>教師個人用提詞台（非學生教材）· 內容取自五天教案逐字稿</footer>
+</div>
+
+<button class="fab" id="fab">📣 四大口令</button>
+<div class="ov" id="ov"><div class="ovbox">
+  <button class="close" onclick="document.getElementById('ov').classList.remove('on')">關閉</button>
+  <h3>四大課室呼喚（老師喊 → 勇者回）· 天天用</h3>
+  <div class="cmdrow"><span class="call">Little Oysters!</span><span class="arr">→</span><span class="resp">Listen!</span><span class="act">捧耳·安靜</span></div>
+  <div class="cmdrow"><span class="call">Green Chopsticks!</span><span class="arr">→</span><span class="resp">Go!</span><span class="act">舉拳·出發</span></div>
+  <div class="cmdrow"><span class="call">Golden Spoon!</span><span class="arr">→</span><span class="resp">Freeze!</span><span class="act">抱胸·靜止</span></div>
+  <div class="cmdrow"><span class="call">Save the table!</span><span class="arr">→</span><span class="resp">Now!</span><span class="act">收桌·坐正</span></div>
+  <p class="hint" style="margin-bottom:2px">忘詞時先喊 <b>Little Oysters!</b> 把全班拉回來。</p>
+</div></div>
+<div class="lb" id="lb" onclick="this.classList.remove('on')"><img id="lbimg" src=""></div>
+
+<script src="data.js"></script>
+<script>
+const IMG = DATA.img, DAYS = DATA.days;
+const TAGMAP={zh:"中",en:"英",cue:"動",stu:"生",cmd:"",note:""};
+const $=s=>document.querySelector(s);
+let state={day:1};
+const KEY="oysterTeachDone";
+function loadDone(){try{return JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){return {}}}
+function saveDone(o){try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
+let done=loadDone();
+
+/* day switcher */
+const daysEl=$("#days");
+DAYS.forEach(d=>{
+  const el=document.createElement("div"); el.className="day"; el.dataset.day=d.n;
+  el.innerHTML=`<div class="dn">Day ${d.n}</div><div class="dt">${d.title}</div><div class="dr">${d.role.split(' · ')[0]}</div>`;
+  el.onclick=()=>switchDay(d.n); daysEl.appendChild(el);
+});
+
+function lineHTML(bl){
+  const tag=(bl.t==="cmd"||bl.t==="note")?"":`<span class="tag t-${bl.t}">${TAGMAP[bl.t]}</span>`;
+  return `<div class="ln ${bl.t}">${tag}<span class="x">${bl.x}</span></div>`;
+}
+function cardHTML(a){
+  let inner=a.img?`<img class="thumb" src="${IMG[a.img]}" alt="${a.title}" loading="lazy">`:"";
+  inner+=a.blocks.map(lineHTML).join("");
+  if(a.steps){inner+=`<div class="steps">`+a.steps.map(s=>`<div class="steph">${s.h}</div>`+s.rows.map(lineHTML).join("")).join("")+`</div>`;}
+  const id=`d${state.day}_${a.id}`;
+  return `<div class="card${a.star?' star':''}" data-id="${id}">
+    <div class="chead"><span class="time">${a.time}</span><span class="ctitle">${a.title}</span>
+      ${a.star?'<span class="starb">★ 重點</span>':''}<span class="caret">▶</span>
+      <div class="chk ${done[id]?'done':''}" data-chk="${id}">✓</div></div>
+    <div class="cbody">${inner}</div></div>`;
+}
+function renderDay(n){
+  const d=DAYS.find(x=>x.n===n);
+  $("#htitle").innerHTML=`Day ${d.n} · ${d.title} <small>${d.en}</small>`;
+  $("#hrole").textContent="🛡️ 你的角色："+d.role;
+  document.querySelectorAll(".day").forEach(e=>e.classList.toggle("on",+e.dataset.day===n));
+  let html="",last=null;
+  d.acts.forEach(a=>{ if(a.p!==last){html+=`<div class="plabel">${a.p}</div>`;last=a.p;} html+=cardHTML(a); });
+  $("#list").innerHTML=html;
+  // open first + star by default
+  const list=$("#list");
+  const f=list.querySelector(".card"); if(f)f.classList.add("open");
+  const s=list.querySelector(".card.star"); if(s)s.classList.add("open");
+  updateProg();
+  $("#expand").textContent="全部展開";
+}
+function switchDay(n){ state.day=n; window.scrollTo({top:0,behavior:"smooth"}); renderDay(n); }
+function updateProg(){
+  const d=DAYS.find(x=>x.n===state.day);
+  const tot=d.acts.length;
+  const dn=d.acts.filter(a=>done[`d${state.day}_${a.id}`]).length;
+  $("#pbar").style.width=(dn/tot*100)+"%";
+  $("#cnt").textContent=`${dn} / ${tot} 完成`;
+}
+
+$("#list").addEventListener("click",e=>{
+  const chk=e.target.closest("[data-chk]");
+  if(chk){e.stopPropagation();const id=chk.dataset.chk;done[id]=!done[id];if(!done[id])delete done[id];
+    chk.classList.toggle("done");saveDone(done);updateProg();return;}
+  const img=e.target.closest(".thumb");
+  if(img){e.stopPropagation();$("#lbimg").src=img.src;$("#lb").classList.add("on");return;}
+  const head=e.target.closest(".chead");
+  if(head){head.closest(".card").classList.toggle("open");}
+});
+let allOpen=false;
+$("#expand").addEventListener("click",()=>{allOpen=!allOpen;
+  document.querySelectorAll(".card").forEach(c=>c.classList.toggle("open",allOpen));
+  $("#expand").textContent=allOpen?"全部收合":"全部展開";});
+$("#dark").addEventListener("click",()=>{document.body.classList.toggle("dark");
+  const big=document.body.classList.contains("dark");
+  document.documentElement.style.setProperty("--fz",big?"1.12":"1");});
+$("#fab").addEventListener("click",()=>$("#ov").classList.add("on"));
+$("#ov").addEventListener("click",e=>{if(e.target.id==="ov")$("#ov").classList.remove("on");});
+
+renderDay(1);
+</script>
+</body>
+</html>
